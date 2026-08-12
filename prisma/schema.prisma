@@ -61,7 +61,11 @@ model Bundle {
   id                String   @id @default(cuid())
   shop              String
   title             String
+  label             String   @default("")
   description       String   @default("")
+  freeShippingText  String   @default("")
+  freeGiftText      String   @default("")
+  cardImageUrl      String   @default("")
   status            String   @default("active")
   discountType      String   @default("percentage")
   discountValue     Float    @default(0)

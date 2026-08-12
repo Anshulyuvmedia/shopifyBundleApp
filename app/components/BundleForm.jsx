@@ -6,7 +6,11 @@ import FormErrors from "./FormErrors";
 
 const emptyForm = {
   title: "",
+  label: "",
   description: "",
+  freeShippingText: "",
+  freeGiftText: "",
+  cardImageUrl: "",
   status: "active",
   discountType: "percentage",
   discountValue: 15,
@@ -66,6 +70,12 @@ export default function BundleForm({ initial }) {
               error={errors.title}
               onInput={(event) => setField("title", event.target.value)}
             />
+            <s-text-field
+              label="Label"
+              value={form.label}
+              placeholder="e.g. Try Pack, Value Pack, Super Saver Pack"
+              onInput={(event) => setField("label", event.target.value)}
+            />
             <s-text-area
               label="Description"
               value={form.description}
@@ -79,6 +89,36 @@ export default function BundleForm({ initial }) {
               <s-option value="active">Active</s-option>
               <s-option value="paused">Paused</s-option>
             </s-select>
+          </s-stack>
+        </s-section>
+
+        <s-section heading="Card display">
+          <s-stack direction="block" gap="base">
+            <s-text-field
+              label="Card Image URL"
+              value={form.cardImageUrl}
+              placeholder="https://cdn.shopify.com/..."
+              onInput={(event) => setField("cardImageUrl", event.target.value)}
+            />
+            {form.cardImageUrl && (
+              <img
+                src={form.cardImageUrl}
+                alt="Bundle card preview"
+                style={{ maxWidth: "200px", borderRadius: "8px", border: "1px solid #ddd" }}
+              />
+            )}
+            <s-text-field
+              label="Free Shipping Text"
+              value={form.freeShippingText}
+              placeholder="e.g. Free Shipping, Free Shipping + Surprise Gift"
+              onInput={(event) => setField("freeShippingText", event.target.value)}
+            />
+            <s-text-field
+              label="Free Gift Text"
+              value={form.freeGiftText}
+              placeholder="e.g. FREE Gift (shown below the bundle)"
+              onInput={(event) => setField("freeGiftText", event.target.value)}
+            />
           </s-stack>
         </s-section>
 

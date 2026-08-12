@@ -119,7 +119,11 @@ export const loader = async ({ request }) => {
     const mapBundle = (row, matchedVariantIds) => ({
       id: row.id,
       title: row.title,
+      label: row.label ?? "",
       description: row.description,
+      freeShippingText: row.freeShippingText ?? "",
+      freeGiftText: row.freeGiftText ?? "",
+      cardImageUrl: row.cardImageUrl ?? "",
       discountType: row.discountType,
       discountValue: row.discountValue,
       items: (Array.isArray(row.items) ? row.items : []).map((item) => ({

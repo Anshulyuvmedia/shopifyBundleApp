@@ -5,7 +5,7 @@
 
   function formatMoney(value) {
     var n = Number(value) || 0;
-    return "$" + n.toFixed(2);
+    return "Rs. " + Math.round(n).toLocaleString("en-IN");
   }
 
   var MAX_PRODUCT_NAME_LENGTH = 40;
@@ -134,80 +134,121 @@
       };
       thumbWrap.appendChild(img);
     }
-    if (item.quantity > 1) {
-      thumbWrap.appendChild(
-        el("span", "pummpy-bundle__thumb-qty", item.quantity + "\u00d7"),
-      );
-    }
     li.appendChild(thumbWrap);
 
     var meta = el("div", "pummpy-bundle__item-meta");
-    meta.appendChild(
-      el("span", "pummpy-bundle__item-name", shortenLabel(item.title)),
-    );
-    if (item.price != null) {
-      var qtyPrice = (Number(item.price) || 0) * (Number(item.quantity) || 1);
-      meta.appendChild(
-        el("span", "pummpy-bundle__item-price", formatMoney(qtyPrice)),
-      );
-    }
+    var nameText = item.quantity > 1
+      ? item.quantity + " \u00d7 " + shortenLabel(item.title)
+      : shortenLabel(item.title);
+    meta.appendChild(el("span", "pummpy-bundle__item-name", nameText));
     li.appendChild(meta);
     return li;
   }
 
+  function calculateBundlePrices(bundle) {
+    var mrp = 0;
+    var items = bundle.items || [];
+    for (var i = 0; i < items.length; i++) {
+      var price = Number(items[i].price) || 0;
+      var qty = Number(items[i].quantity) || 1;
+      mrp += price * qty;
+    }
+    var discount = 0;
+    if (bundle.discountType === "percentage") {
+      discount = mrp * (Number(bundle.discountValue) || 0) / 100;
+    } else if (bundle.discountType === "fixed_amount") {
+      discount = Number(bundle.discountValue) || 0;
+    }
+    var sale = Math.max(0, mrp - discount);
+    return { mrp: mrp, sale: sale, discount: discount };
+  }
+
   function buildBundleCard(bundle) {
-    var card = el("div", "pummpy-bundle__card pummpy-bundle__card--clickable");
+    var card = el("div", "pummpy-bundle__card");
     card.setAttribute("role", "button");
     card.setAttribute("tabindex", "0");
+    card.setAttribute("data-bundle-id", bundle.id);
 
-    var head = el("div", "pummpy-bundle__head");
-    var headText = el("div", "pummpy-bundle__head-text");
-    headText.appendChild(el("div", "pummpy-bundle__title", bundle.title));
+    if (bundle.cardImageUrl) {
+      var imgWrap = el("div", "pummpy-bundle__card-image");
+      var img = document.createElement("img");
+      img.src = bundle.cardImageUrl;
+      img.alt = bundle.title;
+      img.className = "pummpy-bundle__card-img";
+      imgWrap.appendChild(img);
+      card.appendChild(imgWrap);
+    } else {
+      var imgWrap = el("div", "pummpy-bundle__card-image");
+      var placeholder = el("div", "pummpy-bundle__card-placeholder");
+      placeholder.textContent = (bundle.title || "B").charAt(0).toUpperCase();
+      imgWrap.appendChild(placeholder);
+      card.appendChild(imgWrap);
+    }
+
+    var body = el("div", "pummpy-bundle__card-body");
+
+    var topRow = el("div", "pummpy-bundle__card-top");
+    var titleParts = el("div", "pummpy-bundle__card-title-parts");
+    var titleEl = el("div", "pummpy-bundle__title", bundle.title);
+    titleParts.appendChild(titleEl);
+
+    var itemsLine = el("div", "pummpy-bundle__card-items-list");
+    var items = bundle.items || [];
+    for (var i = 0; i < items.length; i++) {
+      var item = items[i];
+      var itemText = item.quantity > 1
+        ? item.quantity + " " + shortenLabel(item.title) + "s"
+        : shortenLabel(item.title);
+      if (i > 0) itemsLine.appendChild(document.createTextNode(" + "));
+      var span = el("span", "pummpy-bundle__card-item-label", itemText);
+      itemsLine.appendChild(span);
+    }
+    titleParts.appendChild(itemsLine);
+
     if (bundle.description) {
-      headText.appendChild(el("div", "pummpy-bundle__desc", bundle.description));
+      titleParts.appendChild(el("div", "pummpy-bundle__desc", bundle.description));
     }
-    head.appendChild(headText);
-    var badge = bundleBadge(bundle);
-    head.appendChild(badge);
-    card.appendChild(head);
+    topRow.appendChild(titleParts);
 
-    var list = el("ul", "pummpy-bundle__items");
-    bundle.items.forEach(function (item) {
-      list.appendChild(buildBundleItem(item));
-    });
-    card.appendChild(list);
+    if (bundle.label) {
+      var badge = el("span", "pummpy-bundle__label-badge");
+      badge.textContent = bundle.label;
+      topRow.appendChild(badge);
+    }
+    body.appendChild(topRow);
 
-    function addBundle() {
-      if (card.getAttribute("data-pummpy-adding") === "true") return;
-      card.setAttribute("data-pummpy-adding", "true");
-      card.classList.add("pummpy-bundle__card--adding");
-      badge.textContent = "Adding\u2026";
-      addToCart(bundle.items.map(variantForCart))
-        .then(function () {
-          badge.textContent = "Added \u2713";
-          setTimeout(function () {
-            card.setAttribute("data-pummpy-adding", "false");
-            card.classList.remove("pummpy-bundle__card--adding");
-            badge.textContent = bundleBadgeLabel(bundle);
-          }, 2000);
-        })
-        .catch(function () {
-          card.setAttribute("data-pummpy-adding", "false");
-          card.classList.remove("pummpy-bundle__card--adding");
-          badge.textContent = "Error \u2013 try again";
-          setTimeout(function () {
-            badge.textContent = bundleBadgeLabel(bundle);
-          }, 2000);
-        });
+    if (bundle.freeShippingText) {
+      body.appendChild(el("div", "pummpy-bundle__meta-text", bundle.freeShippingText));
     }
 
-    card.addEventListener("click", addBundle);
-    card.addEventListener("keydown", function (event) {
-      if (event.key === "Enter" || event.key === " ") {
-        event.preventDefault();
-        addBundle();
-      }
-    });
+    card.appendChild(body);
+
+    var prices = calculateBundlePrices(bundle);
+    var priceBlock = el("div", "pummpy-bundle__price-block");
+
+    var saveAmt = Math.round(prices.discount);
+    if (saveAmt > 0) {
+      var saveTag = el("span", "pummpy-bundle__save-badge");
+      saveTag.textContent = "SAVE " + formatMoney(saveAmt);
+      priceBlock.appendChild(saveTag);
+    }
+
+    var salePrice = el("div", "pummpy-bundle__sale-price", formatMoney(prices.sale));
+    priceBlock.appendChild(salePrice);
+
+    if (prices.mrp > prices.sale) {
+      var mrpPrice = el("div", "pummpy-bundle__mrp-price", formatMoney(prices.mrp));
+      priceBlock.appendChild(mrpPrice);
+    }
+
+    card.appendChild(priceBlock);
+
+    if (bundle.freeGiftText) {
+      var giftRow = el("div", "pummpy-bundle__gift-row");
+      giftRow.appendChild(el("span", "pummpy-bundle__gift-icon", "\uD83C\uDF81"));
+      giftRow.appendChild(el("span", "pummpy-bundle__gift-text", "+ " + bundle.freeGiftText));
+      card.appendChild(giftRow);
+    }
 
     return card;
   }
@@ -217,17 +258,74 @@
 
     var section = el("section", "pummpy-bundle");
     var titleRow = el("div", "pummpy-section-title-row");
-    titleRow.appendChild(el("h3", "pummpy-section-title", "Bundle & save"));
-    titleRow.appendChild(
-      el("span", "pummpy-section-subtitle", "Pick a combo and pay less"),
-    );
+    titleRow.appendChild(el("h3", "pummpy-section-title", "BUNDLE & SAVE MORE"));
     section.appendChild(titleRow);
 
     var row = el("div", "pummpy-bundle__row");
+    var selectedBundle = null;
+
     bundles.forEach(function (bundle) {
-      row.appendChild(buildBundleCard(bundle));
+      var card = buildBundleCard(bundle);
+
+      card.addEventListener("click", function () {
+        row.querySelectorAll(".pummpy-bundle__card").forEach(function (c) {
+          c.classList.remove("pummpy-bundle__card--selected");
+        });
+        card.classList.add("pummpy-bundle__card--selected");
+        selectedBundle = bundle;
+        updateCartButton();
+      });
+
+      card.addEventListener("keydown", function (event) {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          card.click();
+        }
+      });
+
+      row.appendChild(card);
     });
+
     section.appendChild(row);
+
+    var cartBtnWrap = el("div", "pummpy-bundle__cart-btn-wrap");
+    var cartBtn = el("button", "pummpy-bundle__cart-btn");
+    cartBtn.type = "button";
+    cartBtn.textContent = "ADD TO CART";
+    cartBtn.disabled = true;
+
+    function updateCartButton() {
+      if (selectedBundle) {
+        var prices = calculateBundlePrices(selectedBundle);
+        cartBtn.textContent = "ADD TO CART - " + formatMoney(prices.sale);
+        cartBtn.disabled = false;
+      } else {
+        cartBtn.textContent = "ADD TO CART";
+        cartBtn.disabled = true;
+      }
+    }
+
+    cartBtn.addEventListener("click", function () {
+      if (!selectedBundle || cartBtn.disabled) return;
+      cartBtn.disabled = true;
+      cartBtn.textContent = "ADDING\u2026";
+      addToCart(selectedBundle.items.map(variantForCart))
+        .then(function () {
+          cartBtn.textContent = "ADDED \u2713";
+          cartBtn.classList.add("pummpy-bundle__cart-btn--added");
+          setTimeout(function () {
+            cartBtn.classList.remove("pummpy-bundle__cart-btn--added");
+            updateCartButton();
+          }, 2000);
+        })
+        .catch(function () {
+          cartBtn.textContent = "ERROR \u2013 TRY AGAIN";
+          setTimeout(updateCartButton, 2000);
+        });
+    });
+
+    cartBtnWrap.appendChild(cartBtn);
+    section.appendChild(cartBtnWrap);
 
     container.appendChild(section);
   }

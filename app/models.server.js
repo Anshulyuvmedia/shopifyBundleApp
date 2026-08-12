@@ -169,7 +169,11 @@ export function validateBundle(data) {
   const title = String(data.title ?? "").trim();
   if (!title) errors.title = "Title is required.";
 
+  const label = String(data.label ?? "").trim();
   const description = String(data.description ?? "").trim();
+  const freeShippingText = String(data.freeShippingText ?? "").trim();
+  const freeGiftText = String(data.freeGiftText ?? "").trim();
+  const cardImageUrl = String(data.cardImageUrl ?? "").trim();
   const status = VALID_STATUSES.includes(data.status) ? data.status : "active";
 
   const discountType = VALID_BUNDLE_DISCOUNT_TYPES.includes(data.discountType)
@@ -197,7 +201,7 @@ export function validateBundle(data) {
 
   return {
     errors,
-    value: { title, description, status, discountType, discountValue, items },
+    value: { title, label, description, freeShippingText, freeGiftText, cardImageUrl, status, discountType, discountValue, items },
   };
 }
 
@@ -209,7 +213,11 @@ export async function createBundle(shop, data) {
     data: {
       shop,
       title: value.title,
+      label: value.label,
       description: value.description,
+      freeShippingText: value.freeShippingText,
+      freeGiftText: value.freeGiftText,
+      cardImageUrl: value.cardImageUrl,
       status: value.status,
       discountType: value.discountType,
       discountValue: value.discountValue,
@@ -233,7 +241,11 @@ export async function updateBundle(shop, id, data) {
     where: { id },
     data: {
       title: value.title,
+      label: value.label,
       description: value.description,
+      freeShippingText: value.freeShippingText,
+      freeGiftText: value.freeGiftText,
+      cardImageUrl: value.cardImageUrl,
       status: value.status,
       discountType: value.discountType,
       discountValue: value.discountValue,
