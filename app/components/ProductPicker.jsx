@@ -1,4 +1,15 @@
+import { useEffect } from "react";
 import { useAppBridge } from "@shopify/app-bridge-react";
+
+function stripVariantFromName(displayName, variantTitle) {
+  const name = String(displayName || "");
+  const variant = variantTitle ? String(variantTitle).trim() : "";
+  if (!variant) return name;
+  const idx = name.lastIndexOf(variant);
+  if (idx <= 0) return name;
+  const prefix = name.slice(0, idx).replace(/\s*[-–—]\s*$/, "").trim();
+  return prefix || name;
+}
 
 function normalizeProduct(resource) {
   return {
@@ -11,11 +22,21 @@ function normalizeProduct(resource) {
 function normalizeVariant(resource) {
   const product = resource.product ?? {};
   const productImages = product.images ?? [];
+  const hasProductTitle = Boolean(product.title);
+  const variantTitle =
+    resource.title ??
+    (resource.displayName ? resource.displayName.split(" - ").pop() : "") ??
+    "";
+  const productTitle = hasProductTitle
+    ? product.title
+    : variantTitle
+      ? stripVariantFromName(resource.displayName, variantTitle)
+      : (resource.displayName ?? resource.title ?? "Untitled product");
   return {
     id: resource.id,
     productId: product.id ?? "",
-    productTitle: product.title ?? resource.displayName ?? resource.title ?? "Untitled product",
-    variantTitle: resource.displayName ?? resource.title ?? "",
+    productTitle,
+    variantTitle,
     imageUrl: resource.image?.originalSrc ?? productImages[0]?.originalSrc ?? "",
     quantity: 1,
   };
@@ -29,6 +50,50 @@ export default function ProductPicker({
 }) {
   const shopify = useAppBridge();
   const isVariant = resourceType === "variant";
+
+  useEffect(() => {
+    const missing = selection.filter((item) => !item.imageUrl);
+    if (!missing.length) return;
+
+    const numericId = (id) => String(id ?? "").split("/").pop();
+
+    const variantIds = missing
+      .filter((item) => item.id && isVariant)
+      .map((item) => numericId(item.id))
+      .filter(Boolean);
+    const productIds = missing.map((item) => numericId(item.productId)).filter(Boolean);
+
+    if (!variantIds.length && !productIds.length) return;
+
+    const params = new URLSearchParams();
+    if (variantIds.length) params.set("variant_ids", variantIds.join(","));
+    if (productIds.length) params.set("product_ids", productIds.join(","));
+
+    let cancelled = false;
+    fetch(`/app/api/images?${params.toString()}`)
+      .then((res) => (res.ok ? res.json() : { images: {} }))
+      .then((data) => {
+        if (cancelled) return;
+        const images = data.images ?? {};
+        const updated = selection.map((item) => {
+          if (item.imageUrl) return item;
+          const key =
+            images[numericId(item.productId)] ??
+            images[`gid://shopify/Product/${numericId(item.productId)}`] ??
+            images[numericId(item.id)] ??
+            images[`gid://shopify/ProductVariant/${numericId(item.id)}`] ??
+            "";
+          return key ? { ...item, imageUrl: key } : item;
+        });
+        if (updated.some((item, i) => item.imageUrl !== selection[i].imageUrl)) {
+          onSelectionChange(updated);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [selection, isVariant, onSelectionChange]);
 
   const openPicker = async () => {
     const resources = await shopify.resourcePicker({
@@ -76,7 +141,9 @@ export default function ProductPicker({
             <s-paragraph>
               {isVariant
                 ? `${item.productTitle}${
-                    item.variantTitle ? ` — ${item.variantTitle}` : ""
+                    item.variantTitle && item.variantTitle !== "Default Title"
+                      ? ` — ${item.variantTitle}`
+                      : ""
                   }`
                 : item.title}
             </s-paragraph>
