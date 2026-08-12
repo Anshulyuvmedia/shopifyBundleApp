@@ -1,16 +1,6 @@
 import { useEffect } from "react";
 import { useAppBridge } from "@shopify/app-bridge-react";
 
-function stripVariantFromName(displayName, variantTitle) {
-  const name = String(displayName || "");
-  const variant = variantTitle ? String(variantTitle).trim() : "";
-  if (!variant) return name;
-  const idx = name.lastIndexOf(variant);
-  if (idx <= 0) return name;
-  const prefix = name.slice(0, idx).replace(/\s*[-–—]\s*$/, "").trim();
-  return prefix || name;
-}
-
 function cleanName(name) {
   return String(name || "")
     .replace(/\s*[-–—]\s*Default Title$/i, "")
@@ -35,27 +25,45 @@ function normalizeProduct(resource) {
   };
 }
 
-function normalizeVariant(resource) {
-  const product = resource.product ?? {};
-  const productImages = product.images ?? [];
-  const hasProductTitle = Boolean(product.title);
-  const variantTitle =
-    resource.title ??
-    (resource.displayName ? resource.displayName.split(" - ").pop() : "") ??
-    "";
-  const productTitle = hasProductTitle
-    ? product.title
-    : variantTitle
-      ? stripVariantFromName(resource.displayName, variantTitle)
-      : (resource.displayName ?? resource.title ?? "Untitled product");
-  return {
-    id: resource.id,
-    productId: product.id ?? "",
-    productTitle,
-    variantTitle,
-    imageUrl: resource.image?.originalSrc ?? productImages[0]?.originalSrc ?? "",
-    quantity: 1,
-  };
+/**
+ * The variant-type resource picker renders products without images/names on
+ * desktop (known App Bridge issue). Use the product picker with
+ * `filter: { variants: true }` instead: it shows product thumbnails and
+ * returns each product with the selected `variants` array.
+ */
+function normalizePickedVariants(resources) {
+  const items = [];
+  for (const product of resources) {
+    const productId = product.id ?? "";
+    const productTitle = product.title ?? "Untitled product";
+    const productImage =
+      product.images?.[0]?.originalSrc ??
+      product.image?.originalSrc ??
+      "";
+    const variants = Array.isArray(product.variants) ? product.variants : [];
+    for (const variant of variants) {
+      items.push({
+        id: variant.id,
+        productId,
+        productTitle,
+        variantTitle: variant.title ?? "Default Title",
+        imageUrl: variant.image?.originalSrc ?? productImage,
+        quantity: 1,
+      });
+    }
+  }
+  return items;
+}
+
+function selectionIdsForVariants(selection) {
+  const byProduct = {};
+  for (const item of selection) {
+    const productId = item.productId || item.id;
+    if (!productId) continue;
+    if (!byProduct[productId]) byProduct[productId] = [];
+    byProduct[productId].push({ id: item.id });
+  }
+  return Object.entries(byProduct).map(([id, variants]) => ({ id, variants }));
 }
 
 export default function ProductPicker({
@@ -112,16 +120,26 @@ export default function ProductPicker({
   }, [selection, isVariant, onSelectionChange]);
 
   const openPicker = async () => {
-    const resources = await shopify.resourcePicker({
-      type: resourceType,
-      multiple: true,
-      action: "select",
-      selectionIds: selection.map((item) => ({ id: item.id })),
-    });
+    const config = isVariant
+      ? {
+          type: "product",
+          multiple: true,
+          action: "select",
+          filter: { variants: true },
+          selectionIds: selectionIdsForVariants(selection),
+        }
+      : {
+          type: "product",
+          multiple: true,
+          action: "select",
+          selectionIds: selection.map((item) => ({ id: item.id })),
+        };
+
+    const resources = await shopify.resourcePicker(config);
     if (!resources) return;
 
     const normalized = isVariant
-      ? resources.map(normalizeVariant)
+      ? normalizePickedVariants(resources)
       : resources.map(normalizeProduct);
     onSelectionChange(normalized);
   };
@@ -180,9 +198,7 @@ export default function ProductPicker({
       <s-button onClick={openPicker}>
         {selection.length > 0
           ? "Edit selection"
-          : isVariant
-            ? "Select products"
-            : "Select products"}
+          : "Select products"}
       </s-button>
     </s-stack>
   );
