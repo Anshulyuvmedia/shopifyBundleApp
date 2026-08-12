@@ -1,7 +1,7 @@
 (function () {
   "use strict";
 
-  var PROXY_PATH = "/apps/pummpy/offers";
+  var PROXY_PATH = "/apps/shopify-bundle-app/offers";
 
   function formatMoney(value) {
     var n = Number(value) || 0;

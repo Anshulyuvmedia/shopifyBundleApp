@@ -2,7 +2,7 @@
 
 client_id = "866d5e5de98473d1f06dc99ee10018d2"
 name = "demo_suppy"
-application_url = "https://demo-suppy.onrender.com"
+application_url = "https://shopify-bundle-app.onrender.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ api_version = "2026-10"
 scopes = "write_metaobject_definitions,write_metaobjects,write_products,write_discounts"
 
 [auth]
-redirect_urls = [ "https://demo-suppy.onrender.com/api/auth" ]
+redirect_urls = [ "https://shopify-bundle-app.onrender.com/api/auth" ]
 
 [app_proxy]
-url = "https://demo-suppy.onrender.com/api/public"
-subpath = "pummpy"
+url = "https://shopify-bundle-app.onrender.com/api/public"
+subpath = "shopify-bundle-app"
 prefix = "apps"
