@@ -227,12 +227,6 @@
       body.appendChild(el("div", "pummpy-bundle__meta-text", bundle.freeShippingText));
     }
 
-    if (bundle.freeGiftText) {
-      var giftRow = el("div", "pummpy-bundle__gift-row");
-      giftRow.appendChild(el("span", "pummpy-bundle__gift-icon", "\uD83C\uDF81"));
-      giftRow.appendChild(el("span", "pummpy-bundle__gift-text", "+ " + bundle.freeGiftText));
-      card.appendChild(giftRow);
-    }
 
     card.appendChild(body);
 
@@ -246,7 +240,18 @@
       priceBlock.appendChild(mrpPrice);
     }
 
+    
     card.appendChild(priceBlock);
+
+    if (bundle.freeGiftText) {
+      var wrapper = el("div", "pummpy-bundle__item-wrap");
+      wrapper.appendChild(card);
+      var giftRow = el("div", "pummpy-bundle__gift-row");
+      giftRow.appendChild(el("span", "pummpy-bundle__gift-icon", "\uD83C\uDF81"));
+      giftRow.appendChild(el("span", "pummpy-bundle__gift-text", "+ " + bundle.freeGiftText));
+      wrapper.appendChild(giftRow);
+      return wrapper;
+    }
 
     return card;
   }
