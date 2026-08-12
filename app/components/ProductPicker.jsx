@@ -11,6 +11,22 @@ function stripVariantFromName(displayName, variantTitle) {
   return prefix || name;
 }
 
+function cleanName(name) {
+  return String(name || "")
+    .replace(/\s*[-–—]\s*Default Title$/i, "")
+    .trim();
+}
+
+function itemDisplayName(item) {
+  const productTitle = cleanName(item.productTitle) || item.title || "Untitled product";
+  const variantTitle = String(item.variantTitle || "").trim();
+  if (!variantTitle || variantTitle === "Default Title") return productTitle;
+  const cleanedVariant = cleanName(variantTitle);
+  if (!cleanedVariant || productTitle.toLowerCase().includes(cleanedVariant.toLowerCase()))
+    return productTitle;
+  return `${productTitle} — ${variantTitle}`;
+}
+
 function normalizeProduct(resource) {
   return {
     id: resource.id,
@@ -139,13 +155,7 @@ export default function ProductPicker({
               size="base"
             />
             <s-paragraph>
-              {isVariant
-                ? `${item.productTitle}${
-                    item.variantTitle && item.variantTitle !== "Default Title"
-                      ? ` — ${item.variantTitle}`
-                      : ""
-                  }`
-                : item.title}
+              {isVariant ? itemDisplayName(item) : item.title}
             </s-paragraph>
             {showQuantity && (
               <s-number-field
