@@ -1,7 +1,7 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
 client_id = "866d5e5de98473d1f06dc99ee10018d2"
-name = "demo_suppy"
+name = "Custom Bundle App"
 application_url = "https://shopify-bundle-app-lrms.onrender.com"
 embedded = true
 
