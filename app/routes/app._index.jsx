@@ -46,7 +46,7 @@ export default function DashboardPage() {
   const navigate = useNavigate();
 
   return (
-    <s-page heading="Pummpy">
+    <s-page heading="Custom Discounts App">
       <s-grid columns="3">
         <s-grid-item>
           <StatCard
@@ -99,7 +99,7 @@ export default function DashboardPage() {
 
       <s-section slot="aside" heading="About">
         <s-paragraph>
-          Pummpy helps you increase average order value with quantity breaks,
+          Custom Discounts App helps you increase average order value with quantity breaks,
           product bundles, and automatic discounts.
         </s-paragraph>
       </s-section>
