@@ -1,0 +1,19 @@
+<div class="pummpy-cart-upsell" data-pummpy-cart>
+  <script type="application/json" data-pummpy-cart-json>
+    {{ cart.items | json }}
+  </script>
+  <div class="pummpy-cart-upsell__body">
+    <div class="pummpy-offers__loading">Loading offers&hellip;</div>
+  </div>
+</div>
+
+<link rel="stylesheet" href="{{ 'pummpy-offers.css' | asset_url }}">
+<script src="{{ 'pummpy-offers.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Pummpy Cart Upsell",
+  "target": "section",
+  "settings": []
+}
+{% endschema %}

@@ -1,0 +1,13 @@
+{
+  "pummpy": {
+    "productOffers": {
+      "name": "Pummpy Product Offers",
+      "quantityDiscounts": "Quantity discounts",
+      "bundleSave": "Bundle & save"
+    },
+    "cartUpsell": {
+      "name": "Pummpy Cart Upsell",
+      "completeOrder": "Complete your order"
+    }
+  }
+}
