@@ -274,6 +274,9 @@
   font-size: 0.85rem;
   font-weight: 600;
   color: #333;
+  border-radius: 0 0 10px 10px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .pummpy-bundle__gift-icon {
@@ -282,10 +285,6 @@
 
 .pummpy-bundle__gift-text {
   font-weight: 600;
-}
-
-.pummpy-bundle__gift-row--hidden {
-  display: none !important;
 }
 
 .pummpy-bundle__cart-btn-wrap {

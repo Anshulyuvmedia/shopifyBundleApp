@@ -217,19 +217,6 @@
     }
     titleParts.appendChild(titleRow);
 
-    var itemsLine = el("div", "pummpy-bundle__card-items-list");
-    var items = bundle.items || [];
-    for (var i = 0; i < items.length; i++) {
-      var item = items[i];
-      var itemText = item.quantity > 1
-        ? item.quantity + " " + shortenLabel(item.title) + "s"
-        : shortenLabel(item.title);
-      if (i > 0) itemsLine.appendChild(document.createTextNode(" + "));
-      var span = el("span", "pummpy-bundle__card-item-label", itemText);
-      itemsLine.appendChild(span);
-    }
-    titleParts.appendChild(itemsLine);
-
     if (bundle.description) {
       titleParts.appendChild(el("div", "pummpy-bundle__desc", bundle.description));
     }
@@ -244,8 +231,7 @@
       var giftRow = el("div", "pummpy-bundle__gift-row");
       giftRow.appendChild(el("span", "pummpy-bundle__gift-icon", "\uD83C\uDF81"));
       giftRow.appendChild(el("span", "pummpy-bundle__gift-text", "+ " + bundle.freeGiftText));
-      giftRow.classList.add("pummpy-bundle__gift-row--hidden");
-      body.appendChild(giftRow);
+      card.appendChild(giftRow);
     }
 
     card.appendChild(body);
@@ -282,12 +268,8 @@
       card.addEventListener("click", function () {
         row.querySelectorAll(".pummpy-bundle__card").forEach(function (c) {
           c.classList.remove("pummpy-bundle__card--selected");
-          var gr = c.querySelector(".pummpy-bundle__gift-row");
-          if (gr) gr.classList.add("pummpy-bundle__gift-row--hidden");
         });
         card.classList.add("pummpy-bundle__card--selected");
-        var giftRow = card.querySelector(".pummpy-bundle__gift-row");
-        if (giftRow) giftRow.classList.remove("pummpy-bundle__gift-row--hidden");
         selectedBundle = bundle;
         updateCartButton();
       });
@@ -307,16 +289,16 @@
     var cartBtnWrap = el("div", "pummpy-bundle__cart-btn-wrap");
     var cartBtn = el("button", "pummpy-bundle__cart-btn");
     cartBtn.type = "button";
-    cartBtn.textContent = "ADD TO CART";
+    cartBtn.textContent = "Buy Now";
     cartBtn.disabled = true;
 
     function updateCartButton() {
       if (selectedBundle) {
         var prices = calculateBundlePrices(selectedBundle);
-        cartBtn.textContent = "ADD TO CART - " + formatMoney(prices.sale);
+        cartBtn.textContent = "Buy Now - " + formatMoney(prices.sale);
         cartBtn.disabled = false;
       } else {
-        cartBtn.textContent = "ADD TO CART";
+        cartBtn.textContent = "Buy Now";
         cartBtn.disabled = true;
       }
     }
