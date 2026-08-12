@@ -237,7 +237,7 @@
   }
 
   function moveBelowBuyButton(host) {
-    if (host.getAttribute("data-pummpy-after-buy") === "false") return;
+    if (host.getAttribute("data-pummpy-after-buy") !== "true") return;
     var container = host.closest("#MainContent, main, body") || document;
     var payment = container.querySelector(".shopify-payment-button");
     var form = payment ? payment.closest("form") : null;
