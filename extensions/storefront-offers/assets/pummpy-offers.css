@@ -105,7 +105,7 @@
   border: 2px solid #e4e5e7;
   border-radius: 12px;
   background: #fff;
-  overflow: hidden;
+  overflow: visible;
   cursor: pointer;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   position: relative;
@@ -120,6 +120,23 @@
   border-color: #2e7d32;
   box-shadow: 0 0 0 1px #2e7d32, 0 2px 12px rgba(46, 125, 50, 0.15);
   background: #f0faf0;
+}
+
+.pummpy-bundle__label-badge {
+  position: absolute;
+  top: -1px;
+  right: 16px;
+  background: linear-gradient(135deg, #4caf50, #2e7d32);
+  color: #fff;
+  border-radius: 0 0 6px 6px;
+  padding: 0.3rem 0.85rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  z-index: 1;
+  box-shadow: 0 2px 4px rgba(46, 125, 50, 0.35);
+  text-transform: uppercase;
 }
 
 .pummpy-bundle__card-image {
@@ -305,6 +322,29 @@
 
 .pummpy-bundle__cart-btn--added {
   background: linear-gradient(135deg, #1b5e20, #2e7d32);
+}
+
+.pummpy-bundle__gift-footer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #f5f5f5;
+  border: 1px solid #e4e5e7;
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  padding: 0.65rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #333;
+  margin-top: -1px;
+}
+
+.pummpy-bundle__gift-icon {
+  font-size: 1.1rem;
+}
+
+.pummpy-bundle__gift-text {
+  font-weight: 600;
 }
 
 /* === Cart upsell === */

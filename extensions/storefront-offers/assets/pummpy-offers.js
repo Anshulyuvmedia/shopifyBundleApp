@@ -74,9 +74,19 @@
         return res.json();
       })
       .then(function () {
-        // Notify the theme (window + document) so cart drawers update.
-        window.dispatchEvent(new CustomEvent("cart:updated", { detail: {} }));
-        document.dispatchEvent(new CustomEvent("cart:updated", { detail: {} }));
+        return fetch("/cart.js", { headers: { Accept: "application/json" } });
+      })
+      .then(function (res) {
+        return res.json();
+      })
+      .then(function (cart) {
+        window.dispatchEvent(new CustomEvent("cart:change", { detail: { cart: cart } }));
+        document.dispatchEvent(new CustomEvent("cart:change", { detail: { cart: cart } }));
+        window.dispatchEvent(new CustomEvent("cart:updated", { detail: { cart: cart } }));
+        document.dispatchEvent(new CustomEvent("cart:updated", { detail: { cart: cart } }));
+        if (typeof window.CartJS !== "undefined") {
+          window.CartJS.getCart();
+        }
       });
   }
 
@@ -169,6 +179,12 @@
     card.setAttribute("tabindex", "0");
     card.setAttribute("data-bundle-id", bundle.id);
 
+    if (bundle.label) {
+      var badge = el("span", "pummpy-bundle__label-badge");
+      badge.textContent = bundle.label;
+      card.appendChild(badge);
+    }
+
     if (bundle.cardImageUrl) {
       var imgWrap = el("div", "pummpy-bundle__card-image");
       var img = document.createElement("img");
@@ -209,12 +225,6 @@
       titleParts.appendChild(el("div", "pummpy-bundle__desc", bundle.description));
     }
     topRow.appendChild(titleParts);
-
-    if (bundle.label) {
-      var badge = el("span", "pummpy-bundle__label-badge");
-      badge.textContent = bundle.label;
-      topRow.appendChild(badge);
-    }
     body.appendChild(topRow);
 
     if (bundle.freeShippingText) {
@@ -243,13 +253,6 @@
 
     card.appendChild(priceBlock);
 
-    if (bundle.freeGiftText) {
-      var giftRow = el("div", "pummpy-bundle__gift-row");
-      giftRow.appendChild(el("span", "pummpy-bundle__gift-icon", "\uD83C\uDF81"));
-      giftRow.appendChild(el("span", "pummpy-bundle__gift-text", "+ " + bundle.freeGiftText));
-      card.appendChild(giftRow);
-    }
-
     return card;
   }
 
@@ -264,6 +267,9 @@
     var row = el("div", "pummpy-bundle__row");
     var selectedBundle = null;
 
+    var giftFooter = el("div", "pummpy-bundle__gift-footer");
+    giftFooter.style.display = "none";
+
     bundles.forEach(function (bundle) {
       var card = buildBundleCard(bundle);
 
@@ -274,6 +280,7 @@
         card.classList.add("pummpy-bundle__card--selected");
         selectedBundle = bundle;
         updateCartButton();
+        updateGiftFooter();
       });
 
       card.addEventListener("keydown", function (event) {
@@ -287,6 +294,19 @@
     });
 
     section.appendChild(row);
+
+    section.appendChild(giftFooter);
+
+    function updateGiftFooter() {
+      if (selectedBundle && selectedBundle.freeGiftText) {
+        giftFooter.innerHTML = "";
+        giftFooter.style.display = "";
+        giftFooter.appendChild(el("span", "pummpy-bundle__gift-icon", "\uD83C\uDF81"));
+        giftFooter.appendChild(el("span", "pummpy-bundle__gift-text", "+ " + selectedBundle.freeGiftText));
+      } else {
+        giftFooter.style.display = "none";
+      }
+    }
 
     var cartBtnWrap = el("div", "pummpy-bundle__cart-btn-wrap");
     var cartBtn = el("button", "pummpy-bundle__cart-btn");
