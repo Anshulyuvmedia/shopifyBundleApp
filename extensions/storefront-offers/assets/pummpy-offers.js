@@ -205,8 +205,17 @@
 
     var topRow = el("div", "pummpy-bundle__card-top");
     var titleParts = el("div", "pummpy-bundle__card-title-parts");
-    var titleEl = el("div", "pummpy-bundle__title", bundle.title);
-    titleParts.appendChild(titleEl);
+
+    var titleRow = el("div", "pummpy-bundle__title-row");
+    titleRow.appendChild(el("div", "pummpy-bundle__title", bundle.title));
+    var prices = calculateBundlePrices(bundle);
+    var saveAmt = Math.round(prices.discount);
+    if (saveAmt > 0) {
+      var saveTag = el("span", "pummpy-bundle__save-badge");
+      saveTag.textContent = "SAVE " + formatMoney(saveAmt);
+      titleRow.appendChild(saveTag);
+    }
+    titleParts.appendChild(titleRow);
 
     var itemsLine = el("div", "pummpy-bundle__card-items-list");
     var items = bundle.items || [];
@@ -231,17 +240,17 @@
       body.appendChild(el("div", "pummpy-bundle__meta-text", bundle.freeShippingText));
     }
 
+    if (bundle.freeGiftText) {
+      var giftRow = el("div", "pummpy-bundle__gift-row");
+      giftRow.appendChild(el("span", "pummpy-bundle__gift-icon", "\uD83C\uDF81"));
+      giftRow.appendChild(el("span", "pummpy-bundle__gift-text", "+ " + bundle.freeGiftText));
+      giftRow.classList.add("pummpy-bundle__gift-row--hidden");
+      body.appendChild(giftRow);
+    }
+
     card.appendChild(body);
 
-    var prices = calculateBundlePrices(bundle);
     var priceBlock = el("div", "pummpy-bundle__price-block");
-
-    var saveAmt = Math.round(prices.discount);
-    if (saveAmt > 0) {
-      var saveTag = el("span", "pummpy-bundle__save-badge");
-      saveTag.textContent = "SAVE " + formatMoney(saveAmt);
-      priceBlock.appendChild(saveTag);
-    }
 
     var salePrice = el("div", "pummpy-bundle__sale-price", formatMoney(prices.sale));
     priceBlock.appendChild(salePrice);
@@ -267,20 +276,20 @@
     var row = el("div", "pummpy-bundle__row");
     var selectedBundle = null;
 
-    var giftFooter = el("div", "pummpy-bundle__gift-footer");
-    giftFooter.style.display = "none";
-
     bundles.forEach(function (bundle) {
       var card = buildBundleCard(bundle);
 
       card.addEventListener("click", function () {
         row.querySelectorAll(".pummpy-bundle__card").forEach(function (c) {
           c.classList.remove("pummpy-bundle__card--selected");
+          var gr = c.querySelector(".pummpy-bundle__gift-row");
+          if (gr) gr.classList.add("pummpy-bundle__gift-row--hidden");
         });
         card.classList.add("pummpy-bundle__card--selected");
+        var giftRow = card.querySelector(".pummpy-bundle__gift-row");
+        if (giftRow) giftRow.classList.remove("pummpy-bundle__gift-row--hidden");
         selectedBundle = bundle;
         updateCartButton();
-        updateGiftFooter();
       });
 
       card.addEventListener("keydown", function (event) {
@@ -294,19 +303,6 @@
     });
 
     section.appendChild(row);
-
-    section.appendChild(giftFooter);
-
-    function updateGiftFooter() {
-      if (selectedBundle && selectedBundle.freeGiftText) {
-        giftFooter.innerHTML = "";
-        giftFooter.style.display = "";
-        giftFooter.appendChild(el("span", "pummpy-bundle__gift-icon", "\uD83C\uDF81"));
-        giftFooter.appendChild(el("span", "pummpy-bundle__gift-text", "+ " + selectedBundle.freeGiftText));
-      } else {
-        giftFooter.style.display = "none";
-      }
-    }
 
     var cartBtnWrap = el("div", "pummpy-bundle__cart-btn-wrap");
     var cartBtn = el("button", "pummpy-bundle__cart-btn");
@@ -331,15 +327,11 @@
       cartBtn.textContent = "ADDING\u2026";
       addToCart(selectedBundle.items.map(variantForCart))
         .then(function () {
-          cartBtn.textContent = "ADDED \u2713";
-          cartBtn.classList.add("pummpy-bundle__cart-btn--added");
-          setTimeout(function () {
-            cartBtn.classList.remove("pummpy-bundle__cart-btn--added");
-            updateCartButton();
-          }, 2000);
+          window.location.href = "/checkout";
         })
         .catch(function () {
           cartBtn.textContent = "ERROR \u2013 TRY AGAIN";
+          cartBtn.disabled = false;
           setTimeout(updateCartButton, 2000);
         });
     });
