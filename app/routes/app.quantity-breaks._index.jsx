@@ -34,7 +34,7 @@ export function formatTiers(tiers) {
       const value =
         tier.discountType === "percentage"
           ? `${tier.discountValue}%`
-          : `$${tier.discountValue}`;
+          : `₹${tier.discountValue}`;
       return `Buy ${tier.minQuantity}+ → ${value} off`;
     })
     .join(", ");

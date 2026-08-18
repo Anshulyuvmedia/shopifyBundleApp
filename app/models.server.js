@@ -175,11 +175,14 @@ export function validateBundle(data) {
   const freeGiftText = String(data.freeGiftText ?? "").trim();
   const cardImageUrl = String(data.cardImageUrl ?? "").trim();
   const status = VALID_STATUSES.includes(data.status) ? data.status : "active";
+  const displayProductId = String(data.displayProductId ?? "").trim();
+  const displayProductTitle = String(data.displayProductTitle ?? "").trim();
 
   const discountType = VALID_BUNDLE_DISCOUNT_TYPES.includes(data.discountType)
     ? data.discountType
     : "percentage";
   const discountValue = Number(data.discountValue) || 0;
+  const position = Math.max(0, Math.floor(Number(data.position) || 0));
   if (discountType !== "none" && discountValue <= 0) {
     errors.discountValue = "Enter a discount value greater than 0.";
   }
@@ -201,7 +204,7 @@ export function validateBundle(data) {
 
   return {
     errors,
-    value: { title, label, description, freeShippingText, freeGiftText, cardImageUrl, status, discountType, discountValue, items },
+    value: { title, label, description, freeShippingText, freeGiftText, cardImageUrl, status, discountType, discountValue, position, displayProductId, displayProductTitle, items },
   };
 }
 
@@ -221,6 +224,9 @@ export async function createBundle(shop, data) {
       status: value.status,
       discountType: value.discountType,
       discountValue: value.discountValue,
+      position: value.position,
+      displayProductId: value.displayProductId,
+      displayProductTitle: value.displayProductTitle,
       items: value.items,
     },
   });
@@ -249,6 +255,9 @@ export async function updateBundle(shop, id, data) {
       status: value.status,
       discountType: value.discountType,
       discountValue: value.discountValue,
+      position: value.position,
+      displayProductId: value.displayProductId,
+      displayProductTitle: value.displayProductTitle,
       items: value.items,
     },
   });

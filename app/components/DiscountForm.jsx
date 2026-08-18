@@ -166,7 +166,7 @@ export default function DiscountForm({ initial }) {
                 value={String(details.minSpend ?? 0)}
                 min="0"
                 step="0.01"
-                prefix="$"
+                prefix="₹"
                 onInput={(event) => setDetail("minSpend", event.target.value)}
               />
               <s-select
@@ -198,7 +198,7 @@ export default function DiscountForm({ initial }) {
                 value={String(details.amount ?? 0)}
                 min="0"
                 step="0.01"
-                prefix="$"
+                prefix="₹"
                 onInput={(event) => setDetail("amount", event.target.value)}
               />
               <s-number-field
@@ -206,7 +206,7 @@ export default function DiscountForm({ initial }) {
                 value={String(details.minSpend ?? 0)}
                 min="0"
                 step="0.01"
-                prefix="$"
+                prefix="₹"
                 onInput={(event) => setDetail("minSpend", event.target.value)}
               />
             </s-stack>

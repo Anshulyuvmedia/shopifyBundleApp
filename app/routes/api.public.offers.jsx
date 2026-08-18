@@ -126,6 +126,7 @@ export const loader = async ({ request }) => {
       cardImageUrl: row.cardImageUrl ?? "",
       discountType: row.discountType,
       discountValue: row.discountValue,
+      position: Number(row.position) || 0,
       items: (Array.isArray(row.items) ? row.items : []).map((item) => ({
         variantId: String(item.id),
         cartId: numericId(item.id),
@@ -158,6 +159,8 @@ export const loader = async ({ request }) => {
 
       for (const row of bundleRows) {
         const items = Array.isArray(row.items) ? row.items : [];
+        const displayId = String(row.displayProductId ?? "").trim();
+        if (displayId && !allProductIds.includes(displayId)) continue;
         const matches = items.filter((item) =>
           variantIds.some((vid) => String(vid) === String(item.id)),
         );
@@ -169,6 +172,12 @@ export const loader = async ({ request }) => {
       }
     }
   }
+
+  bundles.sort(
+    (a, b) =>
+      (a.position ?? 0) - (b.position ?? 0) ||
+      String(a.title).localeCompare(String(b.title)),
+  );
 
   const variantIdsSet = new Set(
     bundles.flatMap((bundle) =>

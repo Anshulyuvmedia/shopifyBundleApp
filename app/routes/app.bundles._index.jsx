@@ -34,7 +34,7 @@ export function formatDiscount(bundle) {
   const value =
     bundle.discountType === "percentage"
       ? `${bundle.discountValue}%`
-      : `$${bundle.discountValue}`;
+      : `₹${bundle.discountValue}`;
   return `${value} off`;
 }
 
@@ -86,6 +86,7 @@ export default function BundlesPage() {
               <s-table-cell>Title</s-table-cell>
               <s-table-cell>Items</s-table-cell>
               <s-table-cell>Discount</s-table-cell>
+              <s-table-cell>Position</s-table-cell>
               <s-table-cell>Status</s-table-cell>
               <s-table-cell>Actions</s-table-cell>
             </s-table-header-row>
@@ -100,6 +101,7 @@ export default function BundlesPage() {
                 </s-table-cell>
                 <s-table-cell>{bundle.items.length}</s-table-cell>
                 <s-table-cell>{formatDiscount(bundle)}</s-table-cell>
+                <s-table-cell>{bundle.position ?? 0}</s-table-cell>
                 <s-table-cell>
                   <StatusBadge status={bundle.status} />
                 </s-table-cell>

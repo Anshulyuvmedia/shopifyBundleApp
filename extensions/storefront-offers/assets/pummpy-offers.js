@@ -5,7 +5,7 @@
 
   function formatMoney(value) {
     var n = Number(value) || 0;
-    return "Rs. " + Math.round(n).toLocaleString("en-IN");
+    return "₹ " + Math.round(n).toLocaleString("en-IN");
   }
 
   var MAX_PRODUCT_NAME_LENGTH = 40;
@@ -161,7 +161,8 @@
     for (var i = 0; i < items.length; i++) {
       var price = Number(items[i].price) || 0;
       var qty = Number(items[i].quantity) || 1;
-      mrp += price * qty;
+      var unit = Number(items[i].compareAtPrice) || price;
+      mrp += unit * qty;
     }
     var discount = 0;
     if (bundle.discountType === "percentage") {

@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useFetcher, useNavigate } from "react-router";
 import { useAppBridge } from "@shopify/app-bridge-react";
+import BundleDisplayPicker from "./BundleDisplayPicker";
+import BundleImagePicker from "./BundleImagePicker";
 import ProductPicker from "./ProductPicker";
 import FormErrors from "./FormErrors";
 
@@ -14,6 +16,9 @@ const emptyForm = {
   status: "active",
   discountType: "percentage",
   discountValue: 15,
+  position: 0,
+  displayProductId: "",
+  displayProductTitle: "",
   items: [],
 };
 
@@ -94,19 +99,10 @@ export default function BundleForm({ initial }) {
 
         <s-section heading="Card display">
           <s-stack direction="block" gap="base">
-            <s-text-field
-              label="Card Image URL"
+            <BundleImagePicker
               value={form.cardImageUrl}
-              placeholder="https://cdn.shopify.com/..."
-              onInput={(event) => setField("cardImageUrl", event.target.value)}
+              onChange={(url) => setField("cardImageUrl", url)}
             />
-            {form.cardImageUrl && (
-              <img
-                src={form.cardImageUrl}
-                alt="Bundle card preview"
-                style={{ maxWidth: "200px", borderRadius: "8px", border: "1px solid #ddd" }}
-              />
-            )}
             <s-text-field
               label="Free Shipping Text"
               value={form.freeShippingText}
@@ -136,6 +132,39 @@ export default function BundleForm({ initial }) {
           {errors.items && (
             <s-paragraph tone="critical">{errors.items}</s-paragraph>
           )}
+        </s-section>
+
+        <s-section heading="Where this offer shows">
+          <s-paragraph color="subdued">
+            By default the bundle appears on every product page included in the
+            bundle. Choose a single product to show the offer on that product
+            page only.
+          </s-paragraph>
+          <BundleDisplayPicker
+            value={
+              form.displayProductId
+                ? {
+                    id: form.displayProductId,
+                    title: form.displayProductTitle,
+                  }
+                : null
+            }
+            onChange={(display) => {
+              setField("displayProductId", display?.id ?? "");
+              setField("displayProductTitle", display?.title ?? "");
+            }}
+          />
+          <s-number-field
+            label="Display position"
+            value={String(form.position ?? 0)}
+            min="0"
+            step="1"
+            onInput={(event) => setField("position", event.target.value)}
+          />
+          <s-paragraph color="subdued">
+            Bundles are shown in this order on the website. Lower numbers
+            appear first.
+          </s-paragraph>
         </s-section>
 
         <s-section heading="Bundle discount">

@@ -69,7 +69,10 @@ model Bundle {
   status            String   @default("active")
   discountType      String   @default("percentage")
   discountValue     Float    @default(0)
+  position          Int      @default(0)
   shopifyDiscountId String?
+  displayProductId  String   @default("")
+  displayProductTitle String @default("")
   items             Json
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt

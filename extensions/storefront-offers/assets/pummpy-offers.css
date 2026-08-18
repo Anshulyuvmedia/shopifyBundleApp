@@ -177,6 +177,7 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 0.3rem;
 }
 
@@ -238,6 +239,7 @@
   min-width: 100px;
   flex-shrink: 0;
   text-align: right;
+  justify-content: flex-end;
 }
 
 .pummpy-bundle__save-badge {

@@ -47,14 +47,14 @@ export function describeDiscount(discount) {
       const off =
         details.discountType === "percentage"
           ? `${details.discountValue}%`
-          : `$${details.discountValue}`;
-      return `Spend $${details.minSpend ?? 0}, get ${off} off`;
+          : `₹${details.discountValue}`;
+      return `Spend ₹${details.minSpend ?? 0}, get ${off} off`;
     }
     case "fixed_amount": {
       const minSpend = Number(details.minSpend) > 0
-        ? ` when spending $${details.minSpend}`
+        ? ` when spending ₹${details.minSpend}`
         : "";
-      return `$${details.amount ?? 0} off${minSpend}`;
+      return `₹${details.amount ?? 0} off${minSpend}`;
     }
     case "free_shipping":
       return "Free shipping";
