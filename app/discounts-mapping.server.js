@@ -6,8 +6,9 @@
  *
  * @param {object} bundle - The bundle record from the database
  * @param {string} functionId - The Shopify Function ID (from the deployed extension)
+ * @param {object} [admin] - Optional Shopify Admin REST/GraphQL client for fetching variant compareAt prices
  */
-export function buildBundleAppInput(bundle, functionId) {
+export async function buildBundleAppInput(bundle, functionId, admin) {
   const items = Array.isArray(bundle.items) ? bundle.items : [];
 
   const bundleItems = items.map((item) => ({
@@ -15,11 +16,14 @@ export function buildBundleAppInput(bundle, functionId) {
     quantity: Math.max(1, Math.floor(Number(item.quantity) || 1)),
   }));
 
+  const compareAtPrices = admin ? await fetchCompareAtPrices(admin, items) : {};
+
   const configValue = JSON.stringify({
     title: bundle.title,
     bundleItems,
     discountType: bundle.discountType,
     discountValue: Number(bundle.discountValue) || 0,
+    compareAtPrices,
   });
 
   return {
@@ -36,6 +40,42 @@ export function buildBundleAppInput(bundle, functionId) {
       },
     ],
   };
+}
+
+/**
+ * Fetches the compareAt price for each bundle item variant via the Admin API.
+ * Returns a map of { [variantGid]: compareAtPrice } so the checkout function
+ * always knows the MRP even when the checkout input omits it.
+ */
+async function fetchCompareAtPrices(admin, items) {
+  const variantIds = items
+    .map((item) => String(item.id))
+    .filter(Boolean);
+  if (!variantIds.length) return {};
+
+  try {
+    const response = await admin.graphql(
+      `query ($ids: [ID!]!) {
+        productVariants(ids: $ids) {
+          id
+          compareAtPrice
+        }
+      }`,
+      { variables: { ids: variantIds } },
+    );
+    const body = await response.json();
+    const variants = body.data?.productVariants ?? [];
+
+    const prices = {};
+    for (const v of variants) {
+      if (v.compareAtPrice != null) {
+        prices[v.id] = v.compareAtPrice;
+      }
+    }
+    return prices;
+  } catch (_) {
+    return {};
+  }
 }
 
 export function buildAppliesOn(products) {

@@ -225,7 +225,7 @@ export async function syncBundleToShopify(shop, bundle) {
     }
 
     const response = await admin.graphql(APP_CREATE, {
-      variables: { input: buildBundleAppInput(bundle, functionId) },
+      variables: { input: await buildBundleAppInput(bundle, functionId, admin) },
     });
     const body = await response.json();
 

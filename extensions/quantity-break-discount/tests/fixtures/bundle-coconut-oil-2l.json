@@ -1,0 +1,49 @@
+{
+  "payload": {
+    "export": "run",
+    "target": "purchase.order-discount.run",
+    "input": {
+      "cart": {
+        "lines": [
+          {
+            "id": "gid://shopify/CartLine/1",
+            "quantity": 2,
+            "cost": {
+              "amountPerQuantity": { "amount": "499.00" }
+            },
+            "merchandise": {
+              "__typename": "ProductVariant",
+              "id": "gid://shopify/ProductVariant/47961508774051"
+            }
+          }
+        ]
+      },
+      "discountNode": {
+        "metafield": {
+          "value": "{\"title\":\"Coconut oil 2L bundle\",\"bundleItems\":[{\"variantId\":\"gid://shopify/ProductVariant/47961508774051\",\"quantity\":2}],\"discountType\":\"fixed_amount\",\"discountValue\":301,\"compareAtPrices\":{\"gid://shopify/ProductVariant/47961508774051\":\"600.00\"}}"
+        }
+      }
+    },
+    "output": {
+      "discountApplicationStrategy": "FIRST",
+      "discounts": [
+        {
+          "targets": [
+            {
+              "productVariant": {
+                "id": "gid://shopify/ProductVariant/47961508774051",
+                "quantity": 2
+              }
+            }
+          ],
+          "value": {
+            "percentage": {
+              "value": 9.919839679358718
+            }
+          },
+          "message": "Coconut oil 2L bundle"
+        }
+      ]
+    }
+  }
+}

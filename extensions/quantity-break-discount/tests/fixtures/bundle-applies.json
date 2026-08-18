@@ -33,7 +33,7 @@
       },
       "discountNode": {
         "metafield": {
-          "value": "{\"title\":\"firts bundle\",\"bundleItems\":[{\"variantId\":\"gid://shopify/ProductVariant/47961508774051\",\"quantity\":1},{\"variantId\":\"gid://shopify/ProductVariant/47961509200035\",\"quantity\":1}],\"discountType\":\"fixed_amount\",\"discountValue\":15}"
+          "value": "{\"title\":\"firts bundle\",\"bundleItems\":[{\"variantId\":\"gid://shopify/ProductVariant/47961508774051\",\"quantity\":1},{\"variantId\":\"gid://shopify/ProductVariant/47961509200035\",\"quantity\":1}],\"discountType\":\"fixed_amount\",\"discountValue\":15,\"compareAtPrices\":{\"gid://shopify/ProductVariant/47961508774051\":\"600.00\",\"gid://shopify/ProductVariant/47961509200035\":\"150.00\"}}"
         }
       }
     },

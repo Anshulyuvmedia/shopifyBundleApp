@@ -33,7 +33,7 @@
       },
       "discountNode": {
         "metafield": {
-          "value": "{\"title\":\"second bundle\",\"bundleItems\":[{\"variantId\":\"gid://shopify/ProductVariant/47961508970659\",\"quantity\":2},{\"variantId\":\"gid://shopify/ProductVariant/47961509560483\",\"quantity\":1}],\"discountType\":\"percentage\",\"discountValue\":15}"
+          "value": "{\"title\":\"second bundle\",\"bundleItems\":[{\"variantId\":\"gid://shopify/ProductVariant/47961508970659\",\"quantity\":2},{\"variantId\":\"gid://shopify/ProductVariant/47961509560483\",\"quantity\":1}],\"discountType\":\"percentage\",\"discountValue\":15,\"compareAtPrices\":{\"gid://shopify/ProductVariant/47961508970659\":\"100.00\",\"gid://shopify/ProductVariant/47961509560483\":\"250.00\"}}"
         }
       }
     },
