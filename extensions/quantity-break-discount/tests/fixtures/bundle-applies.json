@@ -8,6 +8,10 @@
           {
             "id": "gid://shopify/CartLine/1",
             "quantity": 1,
+            "cost": {
+              "amountPerQuantity": { "amount": "445.00" },
+              "compareAtAmountPerQuantity": { "amount": "600.00" }
+            },
             "merchandise": {
               "__typename": "ProductVariant",
               "id": "gid://shopify/ProductVariant/47961508774051"
@@ -16,6 +20,10 @@
           {
             "id": "gid://shopify/CartLine/2",
             "quantity": 1,
+            "cost": {
+              "amountPerQuantity": { "amount": "100.00" },
+              "compareAtAmountPerQuantity": { "amount": "150.00" }
+            },
             "merchandise": {
               "__typename": "ProductVariant",
               "id": "gid://shopify/ProductVariant/47961509200035"
@@ -31,28 +39,7 @@
     },
     "output": {
       "discountApplicationStrategy": "FIRST",
-      "discounts": [
-        {
-          "targets": [
-            {
-              "productVariant": {
-                "id": "gid://shopify/ProductVariant/47961508774051"
-              }
-            },
-            {
-              "productVariant": {
-                "id": "gid://shopify/ProductVariant/47961509200035"
-              }
-            }
-          ],
-          "value": {
-            "fixedAmount": {
-              "amount": "15.00"
-            }
-          },
-          "message": "firts bundle"
-        }
-      ]
+      "discounts": []
     }
   }
 }

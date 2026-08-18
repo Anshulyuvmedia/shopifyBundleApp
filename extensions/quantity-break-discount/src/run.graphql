@@ -3,6 +3,14 @@ query RunInput {
     lines {
       id
       quantity
+      cost {
+        amountPerQuantity {
+          amount
+        }
+        compareAtAmountPerQuantity {
+          amount
+        }
+      }
       merchandise {
         __typename
         ... on ProductVariant {

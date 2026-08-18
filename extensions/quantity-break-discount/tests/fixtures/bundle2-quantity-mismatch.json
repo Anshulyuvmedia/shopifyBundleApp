@@ -8,6 +8,10 @@
           {
             "id": "gid://shopify/CartLine/1",
             "quantity": 1,
+            "cost": {
+              "amountPerQuantity": { "amount": "200.00" },
+              "compareAtAmountPerQuantity": { "amount": "250.00" }
+            },
             "merchandise": {
               "__typename": "ProductVariant",
               "id": "gid://shopify/ProductVariant/47961509560483"
@@ -16,6 +20,10 @@
           {
             "id": "gid://shopify/CartLine/2",
             "quantity": 2,
+            "cost": {
+              "amountPerQuantity": { "amount": "100.00" },
+              "compareAtAmountPerQuantity": { "amount": "100.00" }
+            },
             "merchandise": {
               "__typename": "ProductVariant",
               "id": "gid://shopify/ProductVariant/47961508970659"
@@ -36,18 +44,20 @@
           "targets": [
             {
               "productVariant": {
-                "id": "gid://shopify/ProductVariant/47961508970659"
+                "id": "gid://shopify/ProductVariant/47961508970659",
+                "quantity": 2
               }
             },
             {
               "productVariant": {
-                "id": "gid://shopify/ProductVariant/47961509560483"
+                "id": "gid://shopify/ProductVariant/47961509560483",
+                "quantity": 1
               }
             }
           ],
           "value": {
             "percentage": {
-              "value": 15
+              "value": 4.375
             }
           },
           "message": "second bundle"
