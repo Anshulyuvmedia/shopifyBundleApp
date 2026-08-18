@@ -295,16 +295,16 @@
     var cartBtnWrap = el("div", "pummpy-bundle__cart-btn-wrap");
     var cartBtn = el("button", "pummpy-bundle__cart-btn");
     cartBtn.type = "button";
-    cartBtn.textContent = "Buy Bunble Now";
+    cartBtn.textContent = "Buy Bundle Now";
     cartBtn.disabled = true;
 
     function updateCartButton() {
       if (selectedBundle) {
         var prices = calculateBundlePrices(selectedBundle);
-        cartBtn.textContent = "Buy Bunble Now - " + formatMoney(prices.sale);
+        cartBtn.textContent = "Buy Bundle Now - " + formatMoney(prices.sale);
         cartBtn.disabled = false;
       } else {
-        cartBtn.textContent = "Buy Bunble Now";
+        cartBtn.textContent = "Buy Bundle Now";
         cartBtn.disabled = true;
       }
     }
