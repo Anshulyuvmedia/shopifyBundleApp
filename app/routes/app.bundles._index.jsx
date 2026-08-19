@@ -66,6 +66,16 @@ export default function BundlesPage() {
       >
         Create bundle
       </s-button>
+      <s-button
+        slot="secondary-action"
+        variant="secondary"
+        onClick={async () => {
+          await fetch("/app/api/cache-clear");
+          shopify.toast.show("Cache cleared — storefront will refresh on next load");
+        }}
+      >
+        Clear cache
+      </s-button>
 
       {bundles.length === 0 ? (
         <EmptyState

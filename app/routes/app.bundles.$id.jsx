@@ -8,6 +8,7 @@ import {
   updateBundle,
 } from "../models.server";
 import { syncBundleToShopify } from "../discounts-sync.server";
+import { cacheClear } from "../cache.server";
 import BundleForm from "../components/BundleForm";
 
 export const loader = async ({ request, params }) => {
@@ -24,6 +25,8 @@ export const action = async ({ request, params }) => {
   const data = await parseJsonBody(request);
   const result = await updateBundle(session.shop, params.id, data);
   if (!result.ok) return result;
+
+  cacheClear();
 
   const bundle = await getBundle(session.shop, params.id);
   const sync = await syncBundleToShopify(session.shop, bundle);

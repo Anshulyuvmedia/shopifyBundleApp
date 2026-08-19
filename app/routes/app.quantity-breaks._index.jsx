@@ -8,6 +8,7 @@ import {
   listQuantityBreaks,
   parseJsonBody,
 } from "../models.server";
+import { cacheClear } from "../cache.server";
 import StatusBadge from "../components/StatusBadge";
 import EmptyState from "../components/EmptyState";
 import DeleteButton from "../components/DeleteButton";
@@ -23,6 +24,7 @@ export const action = async ({ request }) => {
   const data = await parseJsonBody(request);
   if (data.intent === "delete") {
     const result = await deleteQuantityBreak(session.shop, data.id);
+    if (result.ok) cacheClear();
     return { ...result, deleted: result.ok };
   }
   return { ok: false, errors: { action: "Unknown action." } };

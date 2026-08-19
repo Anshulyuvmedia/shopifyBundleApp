@@ -1,6 +1,7 @@
 import { boundary } from "@shopify/shopify-app-react-router/server";
 import { authenticate } from "../shopify.server";
 import { createQuantityBreak, parseJsonBody } from "../models.server";
+import { cacheClear } from "../cache.server";
 import QuantityBreakForm from "../components/QuantityBreakForm";
 
 export const loader = async ({ request }) => {
@@ -11,7 +12,9 @@ export const loader = async ({ request }) => {
 export const action = async ({ request }) => {
   const { session } = await authenticate.admin(request);
   const data = await parseJsonBody(request);
-  return createQuantityBreak(session.shop, data);
+  const result = await createQuantityBreak(session.shop, data);
+  if (result.ok) cacheClear();
+  return result;
 };
 
 export default function NewQuantityBreakPage() {

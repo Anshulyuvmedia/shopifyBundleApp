@@ -8,6 +8,7 @@ import {
   updateDiscount,
 } from "../models.server";
 import { syncDiscountToShopify } from "../discounts-sync.server";
+import { cacheClear } from "../cache.server";
 import DiscountForm from "../components/DiscountForm";
 
 export const loader = async ({ request, params }) => {
@@ -24,6 +25,8 @@ export const action = async ({ request, params }) => {
   const data = await parseJsonBody(request);
   const result = await updateDiscount(session.shop, params.id, data);
   if (!result.ok) return result;
+
+  cacheClear();
 
   const discount = await getDiscount(session.shop, params.id);
   const sync = await syncDiscountToShopify(session.shop, discount);

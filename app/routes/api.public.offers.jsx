@@ -1,5 +1,9 @@
 import { authenticate, apiVersion } from "../shopify.server";
 import prisma from "../db.server";
+import {
+  cacheGet, cacheSet,
+  DB_CACHE_TTL, API_CACHE_TTL,
+} from "../cache.server";
 
 /**
  * The storefront blocks pass numeric Liquid IDs (e.g. `{{ product.id }}`,
@@ -25,6 +29,9 @@ function numericId(gid) {
 async function fetchVariantPrices(session, numericIds) {
   const ids = [...new Set(numericIds.filter(Boolean))];
   if (!ids.length) return {};
+  const cacheKey = `prices:${session.shop}:${ids.sort().join(",")}`;
+  const cached = cacheGet(cacheKey);
+  if (cached) return cached;
   try {
     const res = await fetch(
       `https://${session.shop}/admin/api/${apiVersion}/variants.json?ids=${ids.join(",")}&fields=id,price,compare_at_price`,
@@ -39,6 +46,7 @@ async function fetchVariantPrices(session, numericIds) {
         compareAtPrice: Number(v.compare_at_price) || 0,
       };
     }
+    cacheSet(cacheKey, map, API_CACHE_TTL);
     return map;
   } catch (error) {
     return {};
@@ -53,6 +61,9 @@ async function fetchVariantPrices(session, numericIds) {
 async function fetchProductImages(session, numericProductIds) {
   const ids = [...new Set(numericProductIds.filter(Boolean))];
   if (!ids.length) return {};
+  const cacheKey = `images:${session.shop}:${ids.sort().join(",")}`;
+  const cached = cacheGet(cacheKey);
+  if (cached) return cached;
   try {
     const res = await fetch(
       `https://${session.shop}/admin/api/${apiVersion}/products.json?ids=${ids.join(",")}&fields=id,image&limit=250`,
@@ -65,6 +76,7 @@ async function fetchProductImages(session, numericProductIds) {
       const src = p.image?.src ?? "";
       if (src) map[String(p.id)] = src;
     }
+    cacheSet(cacheKey, map, API_CACHE_TTL);
     return map;
   } catch (error) {
     return {};
@@ -96,14 +108,18 @@ export const loader = async ({ request }) => {
   const bundles = [];
 
   if (all || productId || variantIds.length > 0 || allProductIds.length > 0) {
+    const qbCacheKey = `qb:${session.shop}`;
+    const bundleCacheKey = `bundles:${session.shop}`;
     const [qbRows, bundleRows] = await Promise.all([
-      prisma.quantityBreak.findMany({
-        where: { shop: session.shop, status: "active" },
-        include: { tiers: { orderBy: { minQuantity: "asc" } } },
-      }),
-      prisma.bundle.findMany({
-        where: { shop: session.shop, status: "active" },
-      }),
+      cacheGet(qbCacheKey) ??
+        prisma.quantityBreak.findMany({
+          where: { shop: session.shop, status: "active" },
+          include: { tiers: { orderBy: { minQuantity: "asc" } } },
+        }).then((r) => { cacheSet(qbCacheKey, r, DB_CACHE_TTL); return r; }),
+      cacheGet(bundleCacheKey) ??
+        prisma.bundle.findMany({
+          where: { shop: session.shop, status: "active" },
+        }).then((r) => { cacheSet(bundleCacheKey, r, DB_CACHE_TTL); return r; }),
     ]);
 
     const mapQuantityBreak = (row) => ({
@@ -206,5 +222,17 @@ export const loader = async ({ request }) => {
     }));
   }
 
-  return Response.json({ productId, quantityBreaks, bundles });
+  return new Response(
+    JSON.stringify({ productId, quantityBreaks, bundles }),
+    {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+        // CDN cache: 2 minutes.  Varies by URL (product_id / variant_ids in
+        // the query string), so each product page gets its own cached copy.
+        // "no-store" for the browser so it always revalidates with the CDN.
+        "Cache-Control": "public, s-maxage=120, max-age=0",
+      },
+    },
+  );
 };

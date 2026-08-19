@@ -10,6 +10,7 @@ import {
   parseJsonBody,
 } from "../models.server";
 import { deleteShopifyDiscount } from "../discounts-sync.server";
+import { cacheClear } from "../cache.server";
 import StatusBadge from "../components/StatusBadge";
 import EmptyState from "../components/EmptyState";
 import DeleteButton from "../components/DeleteButton";
@@ -26,8 +27,11 @@ export const action = async ({ request }) => {
   if (data.intent === "delete") {
     const discount = await getDiscount(session.shop, data.id);
     const result = await deleteDiscount(session.shop, data.id);
-    if (result.ok && discount?.shopifyDiscountId) {
-      await deleteShopifyDiscount(session.shop, discount.shopifyDiscountId);
+    if (result.ok) {
+      cacheClear();
+      if (discount?.shopifyDiscountId) {
+        await deleteShopifyDiscount(session.shop, discount.shopifyDiscountId);
+      }
     }
     return { ...result, deleted: result.ok };
   }
