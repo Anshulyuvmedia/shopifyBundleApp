@@ -73,6 +73,7 @@ model Bundle {
   shopifyDiscountId String?
   displayProductId  String   @default("")
   displayProductTitle String @default("")
+  defaultSelected   Boolean  @default(false)
   items             Json
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt

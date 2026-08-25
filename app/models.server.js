@@ -177,6 +177,7 @@ export function validateBundle(data) {
   const status = VALID_STATUSES.includes(data.status) ? data.status : "active";
   const displayProductId = String(data.displayProductId ?? "").trim();
   const displayProductTitle = String(data.displayProductTitle ?? "").trim();
+  const defaultSelected = Boolean(data.defaultSelected);
 
   const discountType = VALID_BUNDLE_DISCOUNT_TYPES.includes(data.discountType)
     ? data.discountType
@@ -204,7 +205,7 @@ export function validateBundle(data) {
 
   return {
     errors,
-    value: { title, label, description, freeShippingText, freeGiftText, cardImageUrl, status, discountType, discountValue, position, displayProductId, displayProductTitle, items },
+    value: { title, label, description, freeShippingText, freeGiftText, cardImageUrl, status, discountType, discountValue, position, displayProductId, displayProductTitle, defaultSelected, items },
   };
 }
 
@@ -227,6 +228,7 @@ export async function createBundle(shop, data) {
       position: value.position,
       displayProductId: value.displayProductId,
       displayProductTitle: value.displayProductTitle,
+      defaultSelected: value.defaultSelected,
       items: value.items,
     },
   });
@@ -258,6 +260,7 @@ export async function updateBundle(shop, id, data) {
       position: value.position,
       displayProductId: value.displayProductId,
       displayProductTitle: value.displayProductTitle,
+      defaultSelected: value.defaultSelected,
       items: value.items,
     },
   });

@@ -143,6 +143,7 @@ export const loader = async ({ request }) => {
       discountType: row.discountType,
       discountValue: row.discountValue,
       position: Number(row.position) || 0,
+      defaultSelected: Boolean(row.defaultSelected),
       items: (Array.isArray(row.items) ? row.items : []).map((item) => ({
         variantId: String(item.id),
         cartId: numericId(item.id),

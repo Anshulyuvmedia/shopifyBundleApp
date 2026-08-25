@@ -186,21 +186,19 @@
       card.appendChild(badge);
     }
 
+    var imgWrap = el("div", "pummpy-bundle__card-image");
     if (bundle.cardImageUrl) {
-      var imgWrap = el("div", "pummpy-bundle__card-image");
       var img = document.createElement("img");
       img.src = bundle.cardImageUrl;
       img.alt = bundle.title;
       img.className = "pummpy-bundle__card-img";
       imgWrap.appendChild(img);
-      card.appendChild(imgWrap);
     } else {
-      var imgWrap = el("div", "pummpy-bundle__card-image");
       var placeholder = el("div", "pummpy-bundle__card-placeholder");
       placeholder.textContent = (bundle.title || "B").charAt(0).toUpperCase();
       imgWrap.appendChild(placeholder);
-      card.appendChild(imgWrap);
     }
+    card.appendChild(imgWrap);
 
     var body = el("div", "pummpy-bundle__card-body");
 
@@ -251,10 +249,10 @@
       giftRow.appendChild(el("span", "pummpy-bundle__gift-icon", "\uD83C\uDF81"));
       giftRow.appendChild(el("span", "pummpy-bundle__gift-text", "+ " + bundle.freeGiftText));
       wrapper.appendChild(giftRow);
-      return wrapper;
+      return { card: card, node: wrapper };
     }
 
-    return card;
+    return { card: card, node: card };
   }
 
   function renderBundles(container, bundles) {
@@ -269,7 +267,9 @@
     var selectedBundle = null;
 
     bundles.forEach(function (bundle) {
-      var card = buildBundleCard(bundle);
+      var result = buildBundleCard(bundle);
+      var card = result.card;
+      var node = result.node;
 
       card.addEventListener("click", function () {
         row.querySelectorAll(".pummpy-bundle__card").forEach(function (c) {
@@ -287,8 +287,18 @@
         }
       });
 
-      row.appendChild(card);
+      row.appendChild(node);
     });
+
+    var defaultBundle = bundles.find(function (b) {
+      return b.defaultSelected;
+    });
+    if (defaultBundle) {
+      var defaultCard = row.querySelector(
+        '[data-bundle-id="' + defaultBundle.id + '"]',
+      );
+      if (defaultCard) defaultCard.click();
+    }
 
     section.appendChild(row);
 
@@ -367,11 +377,12 @@
           return res.json();
         })
         .then(function (data) {
-          if (!data.bundles.length) {
+          if (!data.bundles.length && !data.quantityBreaks.length) {
             renderEmpty(host);
             return;
           }
           host.innerHTML = "";
+          renderQuantityBreaks(host, data.quantityBreaks);
           renderBundles(host, data.bundles);
         })
         .catch(function () {

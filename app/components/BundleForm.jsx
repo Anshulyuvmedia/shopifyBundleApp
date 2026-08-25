@@ -17,6 +17,7 @@ const emptyForm = {
   discountType: "percentage",
   discountValue: 15,
   position: 0,
+  defaultSelected: false,
   displayProductId: "",
   displayProductTitle: "",
   items: [],
@@ -164,6 +165,15 @@ export default function BundleForm({ initial }) {
           <s-paragraph color="subdued">
             Bundles are shown in this order on the website. Lower numbers
             appear first.
+          </s-paragraph>
+          <s-checkbox
+            label="Default selected bundle"
+            checked={form.defaultSelected}
+            onChange={(event) => setField("defaultSelected", event.target.checked)}
+          />
+          <s-paragraph color="subdued">
+            Pre-select this bundle on the product page. Only one bundle can be
+            the default.
           </s-paragraph>
         </s-section>
 
