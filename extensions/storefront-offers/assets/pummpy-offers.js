@@ -290,16 +290,6 @@
       row.appendChild(node);
     });
 
-    var defaultBundle = bundles.find(function (b) {
-      return b.defaultSelected;
-    });
-    if (defaultBundle) {
-      var defaultCard = row.querySelector(
-        '[data-bundle-id="' + defaultBundle.id + '"]',
-      );
-      if (defaultCard) defaultCard.click();
-    }
-
     section.appendChild(row);
 
     var cartBtnWrap = el("div", "pummpy-bundle__cart-btn-wrap");
@@ -317,6 +307,16 @@
         cartBtn.textContent = "Buy Bundle Now";
         cartBtn.disabled = true;
       }
+    }
+
+    var defaultBundle = bundles.find(function (b) {
+      return b.defaultSelected;
+    });
+    if (defaultBundle) {
+      var defaultCard = row.querySelector(
+        '[data-bundle-id="' + defaultBundle.id + '"]',
+      );
+      if (defaultCard) defaultCard.click();
     }
 
     cartBtn.addEventListener("click", function () {
