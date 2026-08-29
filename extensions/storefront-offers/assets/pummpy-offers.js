@@ -5,7 +5,8 @@
 
   function formatMoney(value) {
     var n = Number(value) || 0;
-    return "₹ " + Math.round(n).toLocaleString("en-IN");
+    // return "₹ " + Math.round(n).toLocaleString("en-IN");
+    return "₹ " + Math.round(n);
   }
 
   var MAX_PRODUCT_NAME_LENGTH = 40;
@@ -231,11 +232,11 @@
 
     var priceBlock = el("div", "pummpy-bundle__price-block");
 
-    var salePrice = el("div", "pummpy-bundle__sale-price", prices.sale);
+    var salePrice = el("div", "pummpy-bundle__sale-price", formatMoney(prices.sale));
     priceBlock.appendChild(salePrice);
 
     if (prices.mrp > prices.sale) {
-      var mrpPrice = el("div", "pummpy-bundle__mrp-price", prices.mrp);
+      var mrpPrice = el("div", "pummpy-bundle__mrp-price", formatMoney(prices.mrp));
       priceBlock.appendChild(mrpPrice);
     }
 
@@ -301,7 +302,7 @@
     function updateCartButton() {
       if (selectedBundle) {
         var prices = calculateBundlePrices(selectedBundle);
-        cartBtn.textContent = "Buy Bundle Now - " + prices.sale;
+        cartBtn.textContent = "Buy Bundle Now - " + formatMoney(prices.sale);
         cartBtn.disabled = false;
       } else {
         cartBtn.textContent = "Buy Bundle Now";
