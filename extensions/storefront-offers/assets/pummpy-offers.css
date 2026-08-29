@@ -1,6 +1,6 @@
 .pummpy-offers,
 .pummpy-cart-upsell {
-  font-family: var(--font-body-family, inherit);
+  font-family: Jost, sans-serif;
   margin: 1rem 0;
 }
 
@@ -41,6 +41,7 @@
   font-size: 1.15rem;
   font-weight: 700;
   margin: 0;
+  color: #DC143C;
 }
 
 .pummpy-section-subtitle {
@@ -116,10 +117,10 @@
 .pummpy-bundle__item-wrap .pummpy-bundle__card {
   border-radius: 12px 0 0 0;
 }
-.pummpy-bundle__item-wrap:has(.pummpy-bundle__card--selected)
+/* .pummpy-bundle__item-wrap:has(.pummpy-bundle__card--selected)
   .pummpy-bundle__gift-row {
   background: #f4d100;
-}
+} */
 
 .pummpy-bundle__card:hover {
   border-color: #999;
@@ -170,6 +171,9 @@
   width: 100%;
   height: 100%;
   object-fit: fill;
+  @media only screen and (max-width: 750rem) {
+    object-fit: contian;
+  }
 }
 
 .pummpy-bundle__card-placeholder {
@@ -284,7 +288,7 @@
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  background: #f5f5f5;
+  background: #f4d100;
   border: 2px solid #e4e5e7;
   border-top: 1px solid #e4e5e7;
   border-radius: 0 0 12px 12px;

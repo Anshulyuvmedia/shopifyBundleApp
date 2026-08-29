@@ -231,11 +231,11 @@
 
     var priceBlock = el("div", "pummpy-bundle__price-block");
 
-    var salePrice = el("div", "pummpy-bundle__sale-price", formatMoney(prices.sale));
+    var salePrice = el("div", "pummpy-bundle__sale-price", prices.sale);
     priceBlock.appendChild(salePrice);
 
     if (prices.mrp > prices.sale) {
-      var mrpPrice = el("div", "pummpy-bundle__mrp-price", formatMoney(prices.mrp));
+      var mrpPrice = el("div", "pummpy-bundle__mrp-price", prices.mrp);
       priceBlock.appendChild(mrpPrice);
     }
 
@@ -301,7 +301,7 @@
     function updateCartButton() {
       if (selectedBundle) {
         var prices = calculateBundlePrices(selectedBundle);
-        cartBtn.textContent = "Buy Bundle Now - " + formatMoney(prices.sale);
+        cartBtn.textContent = "Buy Bundle Now - " + prices.sale;
         cartBtn.disabled = false;
       } else {
         cartBtn.textContent = "Buy Bundle Now";
