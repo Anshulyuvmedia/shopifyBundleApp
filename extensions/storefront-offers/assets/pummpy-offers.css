@@ -172,7 +172,7 @@
   height: 100%;
   object-fit: fill;
   @media only screen and (max-width: 750rem) {
-    object-fit: contian;
+    object-fit: contain;
   }
 }
 
@@ -327,6 +327,7 @@
     filter 0.15s ease,
     transform 0.1s ease;
   letter-spacing: 0.04em;
+  font-family: 'Jost';
 }
 
 .pummpy-bundle__cart-btn:hover:not(:disabled) {
